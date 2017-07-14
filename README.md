@@ -15,8 +15,8 @@ repository.
 
 The crash course drill goes as follows:
 
-1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads "VirtualBox downloads")
-**A note to Ubuntu users**: if you use Ubuntu 14.04, install VirtualBox
+1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads "VirtualBox downloads")  
+   **A note to Ubuntu users**: if you use Ubuntu 14.04, install VirtualBox
 from Ubuntu Software Center instead.
 2. Install [Vagrant](https://www.vagrantup.com/downloads.html "Vagrant downloads")
 3. Download the virtual machine configuration from [this zip file](https://d17h27t6h515a5.cloudfront.net/topher/2017/June/5948287e_fsnd-virtual-machine/fsnd-virtual-machine.zip "Udacity VM configuration") or
@@ -40,5 +40,5 @@ Here you go: [VM Setup and troubleshooting](https://classroom.udacity.com/course
 ... although I'm not sure this link will work without being enrolled
 in the course.
 
-Have fun exploring!
+Have fun exploring!  
 srp
