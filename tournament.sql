@@ -14,9 +14,26 @@ CREATE DATABASE tournament;
 \c tournament
 
 -- Create the tables
-CREATE TABLE players (pid serial primary key, name text not null);
-CREATE TABLE matches (mid serial primary key, winner integer, loser integer);
-CREATE VIEW standings as select pid, (select count(winner) from matches where winner = players.pid) as wins, (select count(mid) from matches where winner = players.pid or loser = players.pid) as plays from players;
+CREATE TABLE players (
+     p_id  SERIAL  PRIMARY KEY,
+     name  TEXT    NOT NULL);
+CREATE TABLE matches (
+     m_id   SERIAL   PRIMARY KEY, 
+     winner INTEGER  REFERENCES players(p_id), 
+     loser  INTEGER  REFERENCES players(p_id));
+CREATE VIEW standings AS 
+    SELECT p_id,
+           name,
+           (SELECT COUNT(winner)
+              FROM matches 
+             WHERE winner = players.p_id) 
+                AS wins,
+           (SELECT COUNT(m_id)
+              FROM matches 
+             WHERE winner = players.p_id OR loser = players.p_id) 
+                AS plays 
+      FROM players
+     ORDER BY wins DESC;
 
 -- Extra credit
 -- CREATE TABLE tournament (tid integer primary key, tname text)

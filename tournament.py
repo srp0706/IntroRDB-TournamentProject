@@ -32,7 +32,7 @@ def countPlayers():
     """Returns the number of players currently registered."""
     conn = connect()
     c = conn.cursor()
-    c.execute('SELECT COUNT(pid) FROM players;')
+    c.execute('SELECT COUNT(p_id) FROM players;')
     res = c.fetchone()[0]
     conn.close()
     return res
@@ -69,7 +69,7 @@ def playerStandings():
     """
     conn = connect()
     c = conn.cursor()
-    c.execute('SELECT pid, (select name from players where players.pid = standings.pid) as name, wins, plays FROM standings ORDER BY wins DESC;')
+    c.execute('SELECT * FROM standings;')
     res = c.fetchall()
     conn.close()
     return res
@@ -104,15 +104,11 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    conn = connect()
-    c = conn.cursor()
-    c.execute('SELECT standings.pid, players.name FROM standings INNER JOIN players ON (standings.pid=players.pid) ORDER BY wins DESC;')
-    tmp = c.fetchall()
+    tmp = playerStandings()
     res = []
     for i in xrange(0,len(tmp),2):
         res.append((tmp[i][0],tmp[i][1],
                     tmp[i+1][0],tmp[i+1][1]))
-    conn.close()
     return res
 
 
