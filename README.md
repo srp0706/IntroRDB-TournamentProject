@@ -29,7 +29,9 @@ virtual machine system and libraries, and it may take quite a while
 depending on your internet connection speed.
 6. Login to your virtual machine with `vagrant ssh` in the terminal.
 7. If all went well so far, you can now go to the tournament directory
-and run the unit tests by issuing the command `python tournament_test.py` 
+and create the *tournament* database with the command 
+`psql -f tournament.sql`.
+8. Now run the unit tests by issuing the command `python tournament_test.py` 
 from your vagrant shell. You should see detailed test messages and a 
 final one stating "`Success!  All tests pass!`".
 

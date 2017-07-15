@@ -8,34 +8,55 @@ import psycopg2
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    try:
+        return psycopg2.connect("dbname=tournament")
+    except IOError:
+        print ('Error! Could not connect to the tournament database. Have '
+               'you set it up with "psql -f tournament.sql"?')
+        return
+
+        
+def dbExecute(sqlString,data=None):
+    """Takes a query statement as input and executes it. If the query 
+    returns one or more tuples as results, yields a list of those tuples.
+    Otherwise, returns None.
+    
+    Note that, to protect against SQL injection while still using 
+    psycopg2 library, there is an optional second argument with data for
+    parameterized queries. data should be a tuple so the calling statement
+    dbExecute(sqlString,data) would be written much like psycopg2's 
+    cursor.execute() method."""
+    conn = connect()
+    c = conn.cursor()
+    if (data == None):
+        c.execute(sqlString)
+    else:
+        c.execute(sqlString,data)
+    # sqlString could be a command or a query
+    try:
+        if c.rowcount == 1:
+            return c.fetchone()
+        else:
+            return c.fetchall()
+    except psycopg2.ProgrammingError: # No results to fetch, it's a command
+        conn.commit()
+        return
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    conn = connect()
-    c = conn.cursor()
-    c.execute('DELETE FROM matches;')
-    conn.commit()
-    conn.close()
+    dbExecute('DELETE FROM matches;')
+
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    conn = connect()
-    c = conn.cursor()
-    c.execute('DELETE FROM players;')
-    conn.commit()
-    conn.close()
+    dbExecute('DELETE FROM players;')
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    conn = connect()
-    c = conn.cursor()
-    c.execute('SELECT COUNT(p_id) FROM players;')
-    res = c.fetchone()[0]
-    conn.close()
-    return res
+    res = dbExecute('SELECT COUNT(p_id) FROM players;')
+    return res[0]
 
 
 def registerPlayer(name):
@@ -47,11 +68,7 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    conn = connect()
-    c = conn.cursor()
-    c.execute('INSERT INTO players (name) VALUES (%s);',(name,))
-    conn.commit()
-    conn.close()
+    dbExecute('INSERT INTO players (name) VALUES (%s);',(name,))
 
 
 def playerStandings():
@@ -67,12 +84,7 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    conn = connect()
-    c = conn.cursor()
-    c.execute('SELECT * FROM standings;')
-    res = c.fetchall()
-    conn.close()
-    return res
+    return dbExecute('SELECT * FROM standings;')
 
 
 def reportMatch(winner, loser):
@@ -82,12 +94,7 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    conn = connect()
-    c = conn.cursor()
-    c.execute('INSERT INTO matches (winner, loser) VALUES (%s, %s);', (winner,loser))
-    conn.commit()
-    conn.close()
- 
+    dbExecute('INSERT INTO matches (winner, loser) VALUES (%s, %s);', (winner,loser))
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -106,9 +113,11 @@ def swissPairings():
     """
     tmp = playerStandings()
     res = []
-    for i in xrange(0,len(tmp),2):
-        res.append((tmp[i][0],tmp[i][1],
-                    tmp[i+1][0],tmp[i+1][1]))
+    # Assembles the response tuples (id1, name1, id2, name2) and 
+    #    appends them to the res list
+    res.extend([(tmp[i][0],tmp[i][1],
+                 tmp[i+1][0],tmp[i+1][1]) 
+                 for i in range(0, len(tmp), 2)])
     return res
 
 
