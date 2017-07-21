@@ -35,5 +35,4 @@ CREATE VIEW standings AS
       FROM players
      ORDER BY wins DESC;
 
--- Extra credit
--- CREATE TABLE tournament (tid integer primary key, tname text)
+-- tournament database is ready for use!
