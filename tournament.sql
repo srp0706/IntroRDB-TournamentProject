@@ -34,5 +34,3 @@ CREATE VIEW standings AS
                 AS plays 
       FROM players
      ORDER BY wins DESC;
-
--- tournament database is ready for use!
