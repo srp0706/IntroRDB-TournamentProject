@@ -33,12 +33,12 @@ def dbExecute(sqlString, data=None):
     else:
         c.execute(sqlString, data)
     # sqlString could be a command or a query
-    try:
+    if sqlString[:6].lower() == "select":
         if c.rowcount == 1:
             return c.fetchone()
         else:
             return c.fetchall()
-    except psycopg2.ProgrammingError:  # No results to fetch, it's a command
+    else:     # No results to fetch, it's a command
         conn.commit()
         return
 
